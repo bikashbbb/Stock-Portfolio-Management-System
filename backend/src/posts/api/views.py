@@ -4,8 +4,6 @@ from .serializers import ArticleListSerializer, ArticleDetailSerializer, Article
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter
-
-
 from hitcount.models import HitCount
 from hitcount.views import HitCountMixin
 

@@ -45,7 +45,9 @@ INSTALLED_APPS = [
     "accounts",
     "user_profile",
     "stock",
-    'rest_framework_swagger'
+    'rest_framework_swagger',
+    'drf_yasg'
+
 ]
 
 MIDDLEWARE = [
@@ -143,11 +145,11 @@ REST_FRAMEWORK = {
     # 'DEFAULT_AUTHENTICATION_CLASSES': (
     #     'knox.auth.TokenAuthentication',
     # )
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_PERMISSION_CLASSES': [
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'knox.auth.TokenAuthentication',
     )
 }
-
 CORS_ORIGIN_ALLOW_ALL = True

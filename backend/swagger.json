@@ -1,0 +1,1390 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a stock assistant sever which helps customer to have better experience in stock market.",
+    "version": "1.0.0",
+    "title": "Stock Master"
+  },
+  "host": "127.0.0.1:8000",
+  "schemes": [
+    "http"
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User authenticates"
+    },
+    {
+      "name": "UserProfile",
+      "description": "User manage their profile"
+    },
+    {
+      "name": "News",
+      "description": "News about the stock"
+    },
+    {
+      "name": "stock",
+      "description": "stock operation"
+    },
+    {
+      "name": "database",
+      "description": "database operation"
+    },
+    {
+      "name": "prediction",
+      "description": "stock prediction"
+    }
+  ],
+  "paths": {
+    "/api/auth/user": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get auth user profile by token",
+        "description": "Returns auth user profile",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "token is the login token, in format \"token fa94e7ab\"",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register a new user",
+        "description": "Input username, email and password",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User info for register",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Register"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logs user into the system",
+        "description": "input user auth info to login",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User info for login",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Login"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid username/password supplied"
+          }
+        }
+      }
+    },
+    "/api/auth/user/password/change": {
+      "put": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Update user auth info",
+        "description": "This can only be done by the logged in user.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "token is the login token, in format \"token fa94e7ab\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User info for login",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdatePassword"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid user supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logs out current logged in user session",
+        "description": "use the login user token",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "token is the login token, in format \"token fa94e7ab\"",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid token"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/user_profile/": {
+      "get": {
+        "tags": [
+          "UserProfile"
+        ],
+        "summary": "Get user information by login auth token",
+        "description": "Get user information",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "token is the login token, in format \"token fa94e7ab\"",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/UserProfile"
+            }
+          },
+          "400": {
+            "description": "Invalid token"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "UserProfile"
+        ],
+        "summary": "Create user",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "createUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "token is the login token, in format \"token fa94e7ab\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Created user_profile object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserProfile"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid user supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/update_profile/": {
+      "put": {
+        "tags": [
+          "UserProfile"
+        ],
+        "summary": "Update user information",
+        "description": "This can only be done by the logged in user.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "token is the login token, in format \"token fa94e7ab\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Updated user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateProfile"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid user supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/recommendedStocks": {
+      "get": {
+        "tags": [
+          "stock"
+        ],
+        "summary": "Get statistics of top10 recommended stocks",
+        "description": "Get statistics",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Stock"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      }
+    },
+    "/news/<symbol>/<page>": {
+      "get": {
+        "tags": [
+          "News"
+        ],
+        "summary": "Get more news by symbol and page",
+        "description": "Returns the news data",
+        "operationId": "getPetById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "path",
+            "description": "symbol of stock",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "path",
+            "description": "page of data",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/NewsList"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Data not found"
+          }
+        }
+      }
+    },
+    "/news": {
+      "get": {
+        "tags": [
+          "News"
+        ],
+        "summary": "Get a list of financial news",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/New"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/search/<symbol>/<keyword>/<page>": {
+      "post": {
+        "tags": [
+          "News"
+        ],
+        "summary": "search specific news data",
+        "description": "input symbol of stocks, keyword and page",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "path",
+            "description": "symbol of stock",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "keyword",
+            "in": "path",
+            "description": "search keyword",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "path",
+            "description": "page of data",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/NewsSearch"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Data not found"
+          }
+        }
+      }
+    },
+    "/stocks/": {
+      "get": {
+        "summary": "get all stocks's information from database",
+        "tags": [
+          "stock"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Stock"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/add/": {
+      "post": {
+        "summary": "add stock to user's watching list",
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "header",
+            "description": "token is the login token, in format \"token fa94e7ab\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WatchingList"
+            }
+          }
+        ],
+        "tags": [
+          "stock"
+        ],
+        "responses": {
+          "200": {
+            "description": "add stock to watching list successfully"
+          }
+        }
+      }
+    },
+    "/remove/": {
+      "post": {
+        "summary": "remove stock from user's watching list",
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "header",
+            "description": "token is the login token, in format \"token fa94e7ab\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Remove"
+            }
+          }
+        ],
+        "tags": [
+          "stock"
+        ],
+        "responses": {
+          "200": {
+            "description": "romove stock from watching list successfully"
+          }
+        }
+      }
+    },
+    "/purchase/": {
+      "post": {
+        "summary": "used to purchase stock",
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "header",
+            "description": "token is the login token, in format \"token fa94e7ab\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PurchaseStock"
+            }
+          }
+        ],
+        "tags": [
+          "stock"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "purchase stock successfully",
+            "schema": {
+              "$ref": "#/definitions/PurchaseResult"
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/delete/": {
+      "post": {
+        "summary": "used to sell stocks that user is holding",
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Delete"
+            }
+          }
+        ],
+        "tags": [
+          "stock"
+        ],
+        "responses": {
+          "200": {
+            "description": "delete stock successfully"
+          }
+        }
+      }
+    },
+    "/holdings/": {
+      "get": {
+        "summary": "used to show all stocks that user holds",
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "stock"
+        ],
+        "responses": {
+          "200": {
+            "description": "show all holdings",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Holding"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/update/": {
+      "post": {
+        "summary": "used to update holdings",
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateStock"
+            }
+          }
+        ],
+        "tags": [
+          "stock"
+        ],
+        "responses": {
+          "200": {
+            "description": "update holding successfully"
+          }
+        }
+      }
+    },
+    "/profolio/": {
+      "get": {
+        "summary": "used to show user's profolio",
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "stock"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/Profolio"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stocks/{symbol}/chart/": {
+      "get": {
+        "summary": "used to show chart",
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "stock"
+        ],
+        "responses": {
+          "200": {
+            "description": "show chart",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/ChartStock"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stocks/{symbol}/predict/history/": {
+      "get": {
+        "summary": "used to predict stock's historical trending",
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "prediction"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/History"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stocks/{symbol}/predict/future": {
+      "get": {
+        "summary": "used to predict stock's future trending",
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "prediction"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/Future"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/updateSymbolRequest": {
+      "get": {
+        "summary": "insert all symbols to the database",
+        "tags": [
+          "database"
+        ],
+        "parameters": [
+          {
+            "name": "HTTP_AUTHORIZATION",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "user's login token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "update symbols successfully"
+          }
+        }
+      }
+    },
+    "/updateStockRequest": {
+      "get": {
+        "summary": "insert all stocks to the database",
+        "tags": [
+          "database"
+        ],
+        "parameters": [
+          {
+            "name": "HTTP_AUTHORIZATION",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "user's login token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "insert stocks successfully"
+          }
+        }
+      }
+    },
+    "/updateStockHistoryPredictionRequest/": {
+      "get": {
+        "summary": "used to update history prediction",
+        "tags": [
+          "prediction"
+        ],
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "user's login token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "update history prediction successfully"
+          }
+        }
+      }
+    },
+    "/updateStockFuturePredictionModelRequest/": {
+      "get": {
+        "summary": "used to update future prediction",
+        "tags": [
+          "prediction"
+        ],
+        "parameters": [
+          {
+            "name": "AUTHORIZATION",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "user's login token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "update future prediction successfully"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Login": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "Register": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "UpdatePassword": {
+      "type": "object",
+      "properties": {
+        "old_password": {
+          "type": "string"
+        },
+        "new_password": {
+          "type": "string"
+        }
+      }
+    },
+    "UserProfile": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "birthDate": {
+          "type": "string"
+        },
+        "budget": {
+          "type": "number"
+        }
+      }
+    },
+    "UpdateProfile": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "birthDate": {
+          "type": "string"
+        },
+        "budget": {
+          "type": "number"
+        }
+      }
+    },
+    "Stock": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "lastPrice": {
+          "type": "number"
+        },
+        "volume": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "symbolName": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "start": {
+          "type": "number"
+        },
+        "high": {
+          "type": "number"
+        },
+        "low": {
+          "type": "number"
+        },
+        "split": {
+          "type": "number"
+        },
+        "dividend": {
+          "type": "number"
+        },
+        "change": {
+          "type": "number"
+        },
+        "changePercent": {
+          "type": "number"
+        }
+      }
+    },
+    "WatchingList": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        }
+      }
+    },
+    "Remove": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        }
+      }
+    },
+    "Delete": {
+      "type": "object",
+      "properties": {
+        "symbol_id": {
+          "type": "string"
+        }
+      }
+    },
+    "PurchaseStock": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "shares": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "number"
+        },
+        "date": {
+          "type": "string"
+        },
+        "action": {
+          "type": "integer"
+        }
+      }
+    },
+    "PurchaseResult": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "tradeDat": {
+          "type": "string"
+        },
+        "shares": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "number"
+        },
+        "action": {
+          "type": "integer"
+        }
+      }
+    },
+    "Holding": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "uerName": {
+          "type": "string"
+        },
+        "shares": {
+          "type": "integer"
+        },
+        "date": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "number"
+        },
+        "action": {
+          "type": "integer"
+        }
+      }
+    },
+    "UpdateStock": {
+      "type": "object",
+      "properties": {
+        "symbol_id": {
+          "type": "string"
+        },
+        "shares": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "number"
+        },
+        "date": {
+          "type": "string"
+        },
+        "action": {
+          "type": "integer"
+        }
+      }
+    },
+    "ChartStock": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "close": {
+          "type": "number"
+        },
+        "volumne": {
+          "type": "integer"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "open": {
+          "type": "number"
+        },
+        "high": {
+          "type": "number"
+        },
+        "low": {
+          "type": "number"
+        },
+        "split": {
+          "type": "number"
+        },
+        "dividend": {
+          "type": "number"
+        },
+        "aChange": {
+          "type": "number"
+        },
+        "pChange": {
+          "type": "number"
+        }
+      }
+    },
+    "History": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "number"
+        },
+        "historyErrors": {
+          "type": "number"
+        },
+        "futureErrors": {
+          "type": "number"
+        },
+        "symbol": {
+          "type": "string"
+        }
+      }
+    },
+    "Future": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "number"
+        },
+        "insampleMse": {
+          "type": "number"
+        },
+        "insampleR2": {
+          "type": "number"
+        }
+      }
+    },
+    "Profolio": {
+      "type": "object",
+      "properties": {
+        "holdingList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/HoldingList"
+          }
+        },
+        "transactions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Transactions"
+          }
+        },
+        "symbolData": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SymbolData"
+          }
+        },
+        "composedChartList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ComposedChartList"
+          }
+        }
+      }
+    },
+    "HoldingList": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "lastPrice": {
+          "type": "number"
+        },
+        "change": {
+          "type": "number"
+        },
+        "changePercent": {
+          "type": "number"
+        },
+        "shares": {
+          "type": "integer"
+        },
+        "cosBasis": {
+          "type": "number"
+        },
+        "marketValue": {
+          "type": "number"
+        },
+        "dilyGain": {
+          "type": "number"
+        },
+        "totalGain": {
+          "type": "number"
+        },
+        "noLots": {
+          "type": "integer"
+        }
+      }
+    },
+    "SymbolData": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "dg": {
+          "type": "number"
+        },
+        "tg": {
+          "type": "number"
+        },
+        "mv": {
+          "type": "number"
+        },
+        "open": {
+          "type": "number"
+        },
+        "close": {
+          "type": "number"
+        },
+        "dailyCostBasis": {
+          "type": "number"
+        }
+      }
+    },
+    "Transactions": {
+      "type": "object",
+      "properties": {
+        "tradeDate": {
+          "type": "string"
+        },
+        "shares": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "number"
+        },
+        "action": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "integer"
+        }
+      }
+    },
+    "ComposedChartList": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "dg": {
+          "type": "number"
+        },
+        "tg": {
+          "type": "number"
+        },
+        "mv": {
+          "type": "number"
+        }
+      }
+    },
+    "New": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "NewsList": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "news": {
+          "items": {
+            "$ref": "#/definitions/News"
+          }
+        }
+      }
+    },
+    "News": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "content_preview": {
+          "type": "string"
+        },
+        "urlToImage": {
+          "type": "string"
+        }
+      }
+    },
+    "NewsSearch": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "news": {
+          "items": {
+            "$ref": "#/definitions/News"
+          }
+        },
+        "keywords": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

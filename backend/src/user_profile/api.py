@@ -1,9 +1,9 @@
+from statistics import mode
 from user_profile.models import UserProfile
 from rest_framework import viewsets, permissions, generics, mixins
 from .serializers import UserProfileSerializer
 from rest_framework.response import Response
 from rest_framework import status
-
 # UserProfile Viewset for get user profile and create user profile
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -15,7 +15,11 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # get the user profile information of the login user
-        return self.request.user.user_profile.all()
+
+        if getattr(self, 'swagger_fake_view', False):
+            return UserProfile.objects.none() 
+        else:
+            return self.request.user.user_profile.all()
 
     def perform_create(self, serializer):
         # save the created user information with the owner id equivalent to the auth user id
@@ -23,13 +27,13 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 class UserProfileUpdateViewSet(viewsets.ModelViewSet, generics.UpdateAPIView, mixins.UpdateModelMixin   ):
     # validate if the user login
-    permission_classes = (
-        permissions.IsAuthenticated,
-    )
+    model= UserProfile
+    queryset = UserProfile.objects.all()
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = UserProfileSerializer
-
+        
+    
     def get_object(self):
-        # get all objects in the user_profile
         return self.request.user.user_profile.all()
 
     def update(self, request, *args, **kwargs):
