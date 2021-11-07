@@ -1,11 +1,11 @@
 from logging import exception
 from django.contrib.auth.models import Group, User
-from django.db import reset_queries
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from rest_framework.decorators import api_view
 
 class GroupView(APIView):
     @swagger_auto_schema(operation_description="uid can be none", responses={404: 'slug not found',
@@ -225,17 +225,26 @@ class Comment(APIView):
         else:
             return Response('User must login')
 
-             
-    
-    
-    
-    
 
+class BannedUser(APIView):
+    @swagger_auto_schema(            
+            request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'groupname:': openapi.Schema(type=openapi.TYPE_STRING, description='name of group to bann user'),
+        })
+        )   
+        
+    def post(self,request,uid):
+        try:
+            userobj = User.objects.get(id=uid)
+            obj=  Group.objects.get(groupname=request.body['groupname'],
+                )
+            obj.bannedusers.add(userobj)
+            return Response({'messege':'User banned sucess'})
+        except Exception:
+            return Response({'messege':'invalid body'})
             
-        
-
-
-        
 
 
 

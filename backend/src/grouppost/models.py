@@ -6,6 +6,7 @@ from django.db.models.fields import NullBooleanField
 class Groups(models.Model):
     groupname = models.CharField(max_length=100)
     created_by = models.ForeignKey(User, on_delete= models.CASCADE,related_name='group_created_by')
+    bannedusers = models.ManyToManyField(User,blank=True, related_name= 'bannuser',default=None)
 
     def __str__(self) -> str:
         return self.groupname
