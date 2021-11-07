@@ -23,5 +23,6 @@ urlpatterns = [
     path('', include('user_profile.urls')),
     path('', include('accounts.urls')),
     path('', include('stock.urls')),
-    path('apiview', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'), 
+    path('apiview', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('',include('grouppost.urls'))
 ]
