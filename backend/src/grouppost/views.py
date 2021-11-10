@@ -21,7 +21,7 @@ class GroupView(APIView):
         request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            'groupname:': openapi.Schema(type=openapi.TYPE_STRING, description='name of group to create'),
+            'groupname': openapi.Schema(type=openapi.TYPE_STRING, description='name of group to create'),
         }),responses={200:'Group created sucessfully',404:"only admins/staffs can create groups"})
     def post(self,request,uid,format=None):
         # TODO: if uid is admin == true then only create group
@@ -58,27 +58,28 @@ class GroupView(APIView):
 
 
 class PostView(APIView):
-    @swagger_auto_schema(operation_description="uid: name of the group to get the post from", responses={404: 'No post available',
+    @swagger_auto_schema(operation_description="uid: id of the group to get the post from", responses={404: 'No post available',
     200:"all Post serialized data"
     })
     def get(self,request,uid=None):
       
-        groupobj = Groups.objects.get(groupname=uid)
+        groupobj = Groups.objects.get(id=uid)
         all_post_objects = AllPosts.objects.filter(groupid= groupobj)
         serialize = PostSerializer(all_post_objects,many=True)
         return Response(serialize.data)
 
     @swagger_auto_schema(
+        operation_description="uid: id of the group to post at",
         request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            'post_title:': openapi.Schema(type=openapi.TYPE_STRING, description='Title of the post'),
-            'post_author:': openapi.Schema(type=openapi.TYPE_STRING, description='username of writer of the post'),
-            'post_description:': openapi.Schema(type=openapi.TYPE_STRING, description='Description of the post'),
+            'post_title': openapi.Schema(type=openapi.TYPE_STRING, description='Title of the post'),
+            'post_author': openapi.Schema(type=openapi.TYPE_STRING, description='username of writer of the post'),
+            'post_description': openapi.Schema(type=openapi.TYPE_STRING, description='Description of the post'),
 
         }),responses={200:'Group created sucessfully',404:"only admins/staffs can create groups"})
     def post(self,request,uid):       
-        obj = Groups.objects.get(groupname=uid)
+        obj = Groups.objects.get(id=uid)
         postauthor = User.objects.get(username = request.data['post_author'])
         AllPosts.objects.create(post_title=request.data['post_title'],
         post_likes_count= 0,
@@ -196,9 +197,9 @@ class Comment(APIView):
         request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            'comment_title:': openapi.Schema(type=openapi.TYPE_STRING, description='comment'),
-            'comment_author:': openapi.Schema(type=openapi.TYPE_STRING, description='username of writer of the comment'),
-            'post_id:': openapi.Schema(type=openapi.TYPE_STRING, description='id of the post'),
+            'comment_title': openapi.Schema(type=openapi.TYPE_STRING, description='comment'),
+            'comment_author': openapi.Schema(type=openapi.TYPE_STRING, description='username of writer of the comment'),
+            'post_id': openapi.Schema(type=openapi.TYPE_STRING, description='id of the post'),
 
         }),responses={200:'Group created sucessfully',404:"only admins/staffs can create groups"})  
     def post(self,request,uid):
@@ -231,20 +232,54 @@ class BannedUser(APIView):
             request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            'groupname:': openapi.Schema(type=openapi.TYPE_STRING, description='name of group to bann user'),
+            'groupid': openapi.Schema(type=openapi.TYPE_STRING, description='name of group to bann user'),
         })
         )   
         
     def post(self,request,uid):
         try:
             userobj = User.objects.get(id=uid)
-            obj=  Group.objects.get(groupname=request.body['groupname'],
+            obj=  Group.objects.get(id=request.body['groupid'],
                 )
             obj.bannedusers.add(userobj)
-            return Response({'messege':'User banned sucess'})
+            return Response({'messege':'User banned sucess'},
+            status=200
+            )
         except Exception:
-            return Response({'messege':'invalid body'})
+            return Response({'messege':'invalid body'},
+            status=200
+            )
+
+
+class IsUserBanned(APIView):
+
+    @swagger_auto_schema( 
+        operation_description='uid: username of the user',           
+            request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'groupid:': openapi.Schema(type=openapi.TYPE_STRING, description='1'),
             
+        })
+        )     
+    def post(self,request,uid):
+        obj = Groups.objects.get(id=request.body['groupid'])
+        user = User.objects.get(username=uid)
+        if user in obj.bannedusers:
+            return Response(
+                
+                {"messege":True},
+                status=200
+            )
+        else:
+            return Response(
+            
+            {
+                "messege":False
+            },status=401)
+
+
+
 
 
 
